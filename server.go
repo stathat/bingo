@@ -7,11 +7,11 @@ package bingo
 import (
 	"flag"
 	"fmt"
+	"github.com/stathat/spitz"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
-	"spitz"
 	"syscall"
 )
 
