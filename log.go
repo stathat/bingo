@@ -55,7 +55,6 @@ func LogError(req *http.Request, err *AppError) {
 func writeAccess() {
 	for x := range qaccess {
 		accessLog.Println(x)
-		fmt.Printf("wrote %q to access log\n", x)
 	}
 }
 
