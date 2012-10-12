@@ -17,7 +17,7 @@ import (
 type ContextBuilder func(*http.Request, http.ResponseWriter, *Session) Context
 type ContextHandlerFunc func(Context) *AppError
 
-var NotifyRequestTime func(time.Duration)
+var NotifyRequestTime func(elapsed time.Duration, path string)
 
 func newHandler(fn func(http.ResponseWriter, *http.Request, *Session)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -28,9 +28,9 @@ func newHandler(fn func(http.ResponseWriter, *http.Request, *Session)) http.Hand
 		fn(w, r, session)
 		elapsed := time.Since(start)
 		fmt.Printf("%s - request time: %.3f ms", r.URL.Path, float64(elapsed)/float64(time.Millisecond))
-                if NotifyRequestTime != nil {
-                        NotifyRequestTime(elapsed)
-                }
+		if NotifyRequestTime != nil {
+			NotifyRequestTime(elapsed, r.URL.Path)
+		}
 	}
 }
 
@@ -75,9 +75,9 @@ func newContext(fn ContextHandlerFunc, builder ContextBuilder) http.HandlerFunc 
 		elapsed := time.Since(start)
 
 		LogAccess(context.Request(), elapsed)
-                if NotifyRequestTime != nil {
-                        NotifyRequestTime(elapsed)
-                }
+		if NotifyRequestTime != nil {
+			NotifyRequestTime(elapsed, r.URL.Path)
+		}
 	}
 }
 
@@ -154,9 +154,9 @@ func newReflect(pattern string, handler interface{}, builder ContextBuilder) htt
 
 		elapsed := time.Since(start)
 		fmt.Printf("%s - request time: %.3f ms\n", r.URL.Path, float64(elapsed)/float64(time.Millisecond))
-                if NotifyRequestTime != nil {
-                        NotifyRequestTime(elapsed)
-                }
+		if NotifyRequestTime != nil {
+			NotifyRequestTime(elapsed, r.URL.Path)
+		}
 	}
 }
 
