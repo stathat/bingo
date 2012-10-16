@@ -37,3 +37,13 @@ func StoreAndRedirect(c Context, path string) *AppError {
 	c.Session().Set("return_to", c.Request().URL.Path)
 	return Redirect(c, path)
 }
+
+func RedirectToHttps(c Context) *AppError {
+	url := c.Request().URL
+	if !url.IsAbs() {
+		// XXX this has the port?
+		url.Host = c.Request().Host
+	}
+	url.Scheme = "https"
+	return Redirect(c, url.String())
+}
