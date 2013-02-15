@@ -48,6 +48,18 @@ func RenderJSON(c Context, obj interface{}) *AppError {
 	return nil
 }
 
+func RenderJSONP(c Context, obj interface{}, jsonpCallback string) *AppError {
+	c.Writer().Header().Set("Content-Type", "application/json")
+	c.Writer().Write([]byte(jsonpCallback + "("))
+	encoder := json.NewEncoder(c.Writer())
+	err := encoder.Encode(obj)
+	if err != nil {
+		return ServerError(err, "json encode error")
+	}
+	c.Writer().Write([]byte(");"))
+	return nil
+}
+
 func RenderAtom(template string, data interface{}, context Context) *AppError {
 	context.Writer().Header().Set("Content-Type", "application/atom+xml")
 	return RenderNoLayout(template, data, context)

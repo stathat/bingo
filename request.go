@@ -19,14 +19,14 @@ func IsHttps(r *http.Request) bool {
 }
 
 func WantsJSON(r *http.Request) bool {
-        accept, ok := r.Header["Accept"]
-        if !ok {
-                return false
-        }
-        for _, v := range accept {
-                if strings.Contains(v, "application/json") {
-                        return true
-                }
-        }
-        return false
+	accept, ok := r.Header["Accept"]
+	if !ok {
+		return false
+	}
+	for _, v := range accept {
+		if strings.Contains(v, "application/json") {
+			return true
+		}
+	}
+	return false
 }
