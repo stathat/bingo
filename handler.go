@@ -62,12 +62,14 @@ func newContext(fn ContextHandlerFunc, builder ContextBuilder) http.HandlerFunc 
 		}
 
 		if e := fn(context); e != nil {
-			switch e.Code {
-			case 404:
-				renderNotFound(context)
-			default:
-				handleError(context, e)
-			}
+                        if e.Err != http.ErrBodyNotAllowed {
+                                switch e.Code {
+                                case 404:
+                                        renderNotFound(context)
+                                default:
+                                        handleError(context, e)
+                                }
+                        }
 		}
 
 		context.After()
@@ -208,4 +210,9 @@ func handleErrorInDev(c Context, aerr *AppError) {
 	fmt.Fprintln(c.Writer(), "")
 	fmt.Fprintln(c.Writer(), "Stack trace:")
 	fmt.Fprintln(c.Writer(), string(debug.Stack()))
+	fmt.Println("An error occurred handling:", c.Request().URL.Path)
+	fmt.Println(aerr.Message)
+	fmt.Println(aerr.Err)
+	fmt.Println("Stack trace:")
+	fmt.Println(string(debug.Stack()))
 }
