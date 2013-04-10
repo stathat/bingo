@@ -63,6 +63,7 @@ func newContext(fn ContextHandlerFunc, builder ContextBuilder) http.HandlerFunc 
 
 		if e := fn(context); e != nil {
                         if e.Err != http.ErrBodyNotAllowed {
+                                fmt.Printf("error: %s (%T)\n", e.Err, e.Err)
                                 switch e.Code {
                                 case 404:
                                         renderNotFound(context)
