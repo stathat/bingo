@@ -34,7 +34,8 @@ func Redirect(c Context, path string) *AppError {
 }
 
 func StoreAndRedirect(c Context, path string) *AppError {
-	c.Session().Set("return_to", c.Request().URL.Path)
+	// c.Session().Set("return_to", c.Request().URL.Path)
+	c.Session().Set("return_to", c.Request().URL.RequestURI())
 	return Redirect(c, path)
 }
 
