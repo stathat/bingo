@@ -88,3 +88,7 @@ func logReload() {
 	elf.Close()
 	elf = b
 }
+
+func LogReload() {
+	logReload()
+}
