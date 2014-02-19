@@ -5,8 +5,10 @@
 package bingo
 
 import (
+	"compress/gzip"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"reflect"
 	"runtime/debug"
@@ -163,6 +165,32 @@ func newReflect(pattern string, handler interface{}, builder ContextBuilder) htt
 	}
 }
 
+type gzipResponseWriter struct {
+	io.Writer
+	http.ResponseWriter
+}
+
+func (w gzipResponseWriter) Write(b []byte) (int, error) {
+	return w.Writer.Write(b)
+}
+
+func makeGzipHandler(fn http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
+			fn(w, r)
+			return
+		}
+		w.Header().Set("Content-Encoding", "gzip")
+		// XXX without this, it sniffs the content type based on the actual
+		// XXX content and uses application/gzip.  If content isn't html,
+		// XXX set header yourself.  RenderJSON does it, for example.
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		gz := gzip.NewWriter(w)
+		defer gz.Close()
+		fn(gzipResponseWriter{Writer: gz, ResponseWriter: w}, r)
+	}
+}
+
 func handle(pattern string, fn http.HandlerFunc) {
 	// handle everything below this pattern
 	http.HandleFunc(pattern+"/", fn)
@@ -178,6 +206,10 @@ func HandleFunc(pattern string, handler func(http.ResponseWriter, *http.Request,
 
 func HandleContext(pattern string, handler ContextHandlerFunc, builder ContextBuilder) {
 	handle(pattern, newContext(handler, builder))
+}
+
+func HandleContextGzip(pattern string, handler ContextHandlerFunc, builder ContextBuilder) {
+	handle(pattern, makeGzipHandler(newContext(handler, builder)))
 }
 
 func HandleReflect(pattern string, handler interface{}, builder ContextBuilder) {
