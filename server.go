@@ -2,17 +2,18 @@
 // Use of this source code is governed by an MIT-style license
 // that can be found in the LICENSE file.
 
-package bingo
+package bingo // import "stathat.com/c/bingo"
 
 import (
 	"flag"
 	"fmt"
-	"github.com/stathat/spitz"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"stathat.com/c/spitz"
 )
 
 type Env int
